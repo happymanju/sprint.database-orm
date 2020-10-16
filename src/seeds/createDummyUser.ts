@@ -19,6 +19,7 @@
 
 import { Factory, Seeder } from 'typeorm-seeding'
 import { Connection } from 'typeorm'
+import User from '../entities/UserModel'
 
 /**
  * FIXME
@@ -27,8 +28,25 @@ import { Connection } from 'typeorm'
  * Tip!
  * - Consult the documentation listed in **Refs** above
  */
+
+
 export default class CreateUsers implements Seeder {
     public async run(factory: Factory, connection: Connection): Promise<any> {
-        
+        await connection
+            .createQueryBuilder()
+            .insert()
+            .into(User)
+            .values([
+                {
+                    username: "codechrysalis",
+                    displayName: "Code Chrysalis Admin",
+                    id: "b12f9390-aeb0-11ea-b3de-0242ac130004",
+                    passwordHash: "$2b$10$OaDbdckbS24vzhar1VX5PuT3Cqx24nypbIrdZxI2LzsmIlXahZP52"
+                }
+                ])
+      .execute()
     }
 }
+
+// const createUsers = new CreateUsers();
+// createUsers.run()
