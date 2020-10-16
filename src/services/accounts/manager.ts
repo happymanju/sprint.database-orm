@@ -15,7 +15,7 @@ class AccountManager implements IManager {
    * uncomment the lines in the constructor definition
    */
   constructor() {
-    // this.accountRepository = getRepository(Account);
+    this.accountRepository = getRepository(Account);
   }
 
   /**
@@ -26,15 +26,18 @@ class AccountManager implements IManager {
    * - Derive balance (both debit and credit)
    */
 
-  public async getAccount(accountId: string): Promise<AccountWithBalance> {
+  public async getAccount(accountId: string): Promise<Account> {
     // You are free to remove any lines below
-    const blankAccount = <AccountWithBalance>new Account();
+    //const blankAccount = <AccountWithBalance>new Account();
+    //const blankAccount = await this.accountRepository.findOne(accountId);
+    //console.log('test account: ', blankAccount);
 
     // FIXME Your should derive account balance by aggregating all the transactions
-    let accountBalanceDerived = 0.0;
-    blankAccount.balance = accountBalanceDerived;
+    // console.log("ACCOUNT!!!!!",this.accountRepository);
+    //let accountBalanceDerived = 0.0;
+    //blankAccount.balance = accountBalanceDerived;
 
-    return Promise.resolve(blankAccount);
+    return Promise.resolve(this.accountRepository.findOne({ id: accountId }));
   }
 
   /**
@@ -42,7 +45,13 @@ class AccountManager implements IManager {
    * create a new account
    */
   public async createAccount(details: Partial<Account>): Promise<Account> {
-    return Promise.resolve(new Account());
+    console.log('details for account creation:' , details);
+
+    const newAcc = new Account();
+    newAcc.name = details.name;
+    newAcc.owner = details.owner;
+    
+    return Promise.resolve(this.accountRepository.save(newAcc));
   }
 
   /**
