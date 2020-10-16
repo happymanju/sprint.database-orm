@@ -37,8 +37,6 @@ class UserManager implements IManager {
    * FIXME
    */
   public async getUser(userId: string): Promise<User> {
-    //const userData = await this.userRepository.findOne({ id: userId });
-    //console.log('user data was found: ', userData);
     return Promise.resolve(this.userRepository.findOne({ id: userId }));   
   }
 
@@ -64,10 +62,13 @@ class UserManager implements IManager {
    * FIXME
    */
   public async updateUser(userId: string, updates: Partial<User>): Promise<User> {
-    // first try:
-    //const userToUpdate = await this.getUser(userId);
-    //return this.userRepository.save(userToUpdate[updates])
-    return Promise.resolve(new User());  
+    const userToUpdate = await this.getUser(userId);
+    
+    for (let key in updates) {
+      userToUpdate[key] = updates[key];
+    }
+    
+    return Promise.resolve(this.userRepository.save(userToUpdate));  
   }
 
   /**
@@ -82,7 +83,7 @@ class UserManager implements IManager {
    * FIXME
    */
   public async removeUser(userId: string): Promise<DeleteResult | void> {
-    return Promise.resolve();
+    return Promise.resolve(this.userRepository.delete(userId));
   }
 
   /**
