@@ -45,7 +45,6 @@ class AccountManager implements IManager {
    * create a new account
    */
   public async createAccount(details: Partial<Account>): Promise<Account> {
-    console.log('details for account creation:' , details);
 
     const newAcc = new Account();
     newAcc.name = details.name;

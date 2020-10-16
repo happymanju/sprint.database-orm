@@ -1,6 +1,7 @@
 import { Repository, getRepository, DeleteResult, MoreThanOrEqual } from "typeorm";
 import Transaction from "../../entities/TransactionModel";
 import { IManager } from "../common/manager";
+import Account from "../../entities/AccountModel";
 
 interface TransactionWithAccountId extends Transaction {
   accountId: string;
@@ -15,6 +16,7 @@ interface TransactionWithAccountId extends Transaction {
  */
 class TransactionManager implements IManager {
   protected transactionRepository: Repository<Transaction>;
+  protected accountRepository: Repository<Account>;
 
   /**
    * FIXME
@@ -22,7 +24,8 @@ class TransactionManager implements IManager {
    * uncomment the lines in the constructor definition
    */
   constructor() {
-    // this.transactionRepository = getRepository(Transaction);
+    this.transactionRepository = getRepository(Transaction);
+    this.accountRepository = getRepository(Account);
   }
 
   /**
@@ -30,7 +33,7 @@ class TransactionManager implements IManager {
    * Get a transaction from database
    */
   public async getTransaction(transactionId: string): Promise<Transaction> {
-    return Promise.resolve(new Transaction());
+    return Promise.resolve(this.transactionRepository.findOne(transactionId));
   }
 
   /**
@@ -38,7 +41,18 @@ class TransactionManager implements IManager {
    * Get a list of transactions with ids from database
    */
   public async listTransactionsByIds(transactionIds: string[]): Promise<Transaction[]> {
-    return Promise.resolve([]);
+    // TODO!!
+    // console.log('transactionIds input: ', transactionIds);
+    const listOfTransactions = [];
+    
+    for (let id of transactionIds) {
+      listOfTransactions.push({transactionId: this.getTransaction(id)});
+    }
+
+    //console.log("after loop: ", listOfTransactions);
+    let result = await Promise.all(listOfTransactions);
+    //console.log("result: ", result);
+    return Promise.resolve(result);
   }
 
   /**
@@ -46,7 +60,13 @@ class TransactionManager implements IManager {
    * Get a list of transactions of a particular account
    */
   public async listTransactionsInAccount(accountId: string): Promise<Transaction[]> {
-    return Promise.resolve([]);
+    
+    const accountToAccess = await getRepository(Account).findOne(accountId);
+    //console.log("account: ", accountToAccess);
+    const transactions = accountToAccess.transactions;
+    //console.log("transactions", transactions);
+
+    return Promise.resolve(transactions);
   }
 
   /**
@@ -62,7 +82,17 @@ class TransactionManager implements IManager {
    * create a new transaction
    */
   public async createTransaction(details: Partial<TransactionWithAccountId>): Promise<Transaction> {
-    return Promise.resolve(new Transaction());
+    //TODO
+    console.log('details: ', details);
+    const newTransaction = new Transaction();
+    newTransaction.amount = details.amount;
+    newTransaction.transactionDate = details.transactionDate;
+    newTransaction.description = details.description || null;
+
+    newTransaction.account = await this.accountRepository.findOne(details.accountId);
+    
+
+    return await this.transactionRepository.save(newTransaction);;
   }
 
   /**

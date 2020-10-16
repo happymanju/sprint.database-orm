@@ -397,7 +397,7 @@ describe("expense manager", () => {
        */
     });
 
-    it("should be able to create and retrieve a transaction", async () => {
+    it.only("should be able to create and retrieve a transaction", async () => {
       /**
        * Requirements:
        * - A transaction can only be created if there
@@ -412,6 +412,7 @@ describe("expense manager", () => {
         description: "electricity bill",
       });
       expect(createResponse).to.have.status(201);
+      console.log(createResponse.body);
 
       const { id } = createResponse.body;
       const getResponse = await chai.request(app).get(`/transactions/${id}`).set("Authorization", accessToken);
