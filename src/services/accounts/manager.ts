@@ -59,7 +59,13 @@ class AccountManager implements IManager {
    * update account details
    */
   public async updateAccount(accountId: string, changes: Partial<Account>): Promise<Account> {
-    return Promise.resolve(new Account());
+    const accountToUpdate = await this.getAccount(accountId);
+    
+    for (let change in changes) {
+      accountToUpdate[change] = changes[change];
+    }
+    
+    return Promise.resolve(this.accountRepository.save(accountToUpdate));
   }
 
   /**
@@ -70,7 +76,7 @@ class AccountManager implements IManager {
    * - Cascade and delete all transactions
    */
   public async deleteAccount(accountId: string): Promise<DeleteResult | void> {
-    return Promise.resolve();
+    return Promise.resolve(this.accountRepository.delete(accountId));
   }
 }
 
